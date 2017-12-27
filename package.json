@@ -5,6 +5,8 @@
   "scripts": {},
   "dependencies": {},
   "devDependencies": {
+    "fs-extra": "^5.0.0",
+    "glob": "^7.1.2",
     "ts-loader": "^3.2.0",
     "typescript": "^2.6.2",
     "uglifyjs-webpack-plugin": "^1.1.4",

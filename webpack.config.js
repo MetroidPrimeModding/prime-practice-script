@@ -1,8 +1,14 @@
 const path = require('path');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const PadWithNullsPlugin = require('./loaders/pad-with-null');
-const dev = !!process.env.DEV_MODE;
+const dev = process.env.DEV_MODE == 'true';
 const output = process.env.OUTPUT_PATH;
+
+if (dev) {
+  console.log('Dev build');
+} else {
+  console.log('Prod build');
+}
 
 const config = {
   entry: './src/main.ts',
@@ -35,7 +41,7 @@ const config = {
         uglifyOptions: {
           ecma: 5,
           mangle: {
-            properties: true
+            properties: false
           },
           compress: true
         }

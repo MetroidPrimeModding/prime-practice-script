@@ -1,4 +1,10 @@
-import {Menu, MenuItem} from "./menu";
+import {Menu, MenuItem, MenuItemSubmenu} from "./menu";
+import {WARP_MENU} from "./warps";
+import {drawInputs} from "./drawInputs";
+import {drawIGT} from "./drawIGT";
+import {drawPlayerSpeed} from "./drawPlayerSpeed";
+import {drawRoomTimers} from "./drawRoomTimers";
+import {CONFIG, CONFIG_MENU} from "./config";
 
 enum GXPrimitive {
   GX_POINTS = 0xB8,
@@ -15,27 +21,22 @@ const LINE_PADDING = 2;
 const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
 
 let pads: PADInfo[];
-let gameState: CGameState;
-let player: CPlayer;
-
-const warpMenu = new Menu([
-  new MenuItem('Landing Site', function () {
-    warp(0x39F2DE28, 0xB2701146);
-  })
-], 140, 45);
+let gameState: CGameState | null;
+let player: CPlayer | null;
+let world: CWorld | null;
 
 const mainMenu = new Menu([
-  new MenuItem('Room Options'),
-  new MenuItem('Inventory'),
-  new MenuItem('Cheats'),
-  new MenuItem('Warp', warpMenu),
-  new MenuItem('Reload'),
-  new MenuItem('Save'),
-  new MenuItem('Change Layer'),
+  new MenuItem('Room Options [soon]'),
+  new MenuItem('Inventory [soon]'),
+  new MenuItem('Cheats [soon]'),
+  new MenuItemSubmenu('Warp', WARP_MENU),
+  new MenuItem('Reload [soon]'),
+  new MenuItem('Save [soon]'),
+  new MenuItem('Change Layer [soon]'),
+  new MenuItemSubmenu('Config', CONFIG_MENU),
   new MenuItem('Reload scripts', () => nativeRequire('/mod.js'))
-], 5, 45);
+], 10, 60);
 mainMenu.active = true;
-
 
 global.onFrame = function () {
   try {
@@ -43,21 +44,39 @@ global.onFrame = function () {
     pads = readPads();
     gameState = getGameState();
     player = getPlayer();
+    world = getWorld();
 
     setTextColor(1, 1, 1, 1);
-    drawText('Prime Practice Mod', 5, 5);
-    drawIGT(160, 5);
-    drawInputs(270, 5);
-    drawPlayerSpeed(5, 15);
+    let y = 10;
+    if (CONFIG.showInput) {
+      drawText('Prime Practice Mod', 10, y);
+      drawIGT(gameState, 165, 10);
+      drawInputs(pads[0], 275, 10);
+      y += LINE_HEIGHT;
+    }
+    if (CONFIG.showSpeed) {
+      drawPlayerSpeed(player, 10, y);
+      y += LINE_HEIGHT;
+    }
+    if (CONFIG.showRoomTimers) {
+      drawRoomTimers(gameState, world, 10, y);
+      y += LINE_HEIGHT;
+    }
 
     if (isPauseScreen()) {
       drawPauseScreen()
     }
     setTextColor(1, 1, 1, 1);
+
+    if (pads[0].digital.lDigital && pads[0].digital.rDigital && pads[0].pressed.start) {
+      nativeRequire('/mod.js');
+    }
+
   } catch (error) {
     setTextColor(1, 0, 0, 1);
     drawText('Error: ' + error + error.stack, 5, 100);
   }
+  Duktape.gc();
 };
 
 Number.prototype.formatNumber = function (len, decimal, filler) {
@@ -72,92 +91,9 @@ Number.prototype.formatNumber = function (len, decimal, filler) {
   return res;
 };
 
-
-function drawIGT(x: number, y: number) {
-  if (!gameState) {
-    return;
-  }
-  const time = gameState.playtime;
-  const ms = Math.floor((time * 1000) % 1000);
-  const sec = Math.floor(time % 60);
-  const minutes = Math.floor(time / 60) % 60;
-  const hours = Math.floor(time / 60 / 60) % 60;
-
-  const text = hours.formatNumber(2, 0, '0') + ':'
-    + minutes.formatNumber(2, 0, '0') + ':'
-    + sec.formatNumber(2, 0, '0') + '.'
-    + ms.formatNumber(3, 0, '0');
-
-  drawText(text, x, y)
-}
-
-function drawPlayerSpeed(x: number, y: number) {
-  if (!player) {
-    return;
-  }
-  let hspeed = Math.sqrt(
-    player.speed.x * player.speed.x
-    + player.speed.y * player.speed.y
-  );
-  let rspeed = Math.sqrt(
-    player.rotation.x * player.rotation.x
-    + player.rotation.y * player.rotation.y
-    + player.rotation.z * player.rotation.z
-  );
-  const str = 's '
-    + player.speed.x.formatNumber(7, 2) + 'x '
-    + player.speed.y.formatNumber(7, 2) + 'y '
-    + player.speed.z.formatNumber(7, 2) + 'z '
-    + hspeed.formatNumber(7, 2) + 'h '
-    + 'r '
-    + player.rotation.x.formatNumber(7, 2) + 'x '
-    + player.rotation.y.formatNumber(7, 2) + 'y '
-    + player.rotation.z.formatNumber(7, 2) + 'z '
-    + rspeed.formatNumber(7, 2) + 't '
-  ;
-
-  drawText(str, x, y);
-}
-
-function drawInputs(x: number, y: number) {
-  const pad = pads[0].digital;
-  let inp = '';
-  inp += pad.stickUp ? '\x18' : ' ';
-  inp += pad.stickDown ? '\x19' : ' ';
-  inp += pad.stickLeft ? '\x1B' : ' ';
-  inp += pad.stickRight ? '\x1A' : ' ';
-
-  inp += pad.a ? 'a' : ' ';
-  inp += pad.b ? 'b' : ' ';
-  inp += pad.x ? 'x' : ' ';
-  inp += pad.y ? 'y' : ' ';
-  inp += pad.start ? 's' : ' ';
-  inp += pad.z ? 'z' : ' ';
-
-  inp += pad.lAnalog ? 'l' : ' ';
-  inp += pad.lDigital ? 'L' : ' ';
-  inp += pad.rAnalog ? 'r' : ' ';
-  inp += pad.rDigital ? 'R' : ' ';
-
-  inp += (pad.up || pad.down || pad.left || pad.right) ? 'd' : ' ';
-
-  inp += pad.up ? '\x18' : ' ';
-  inp += pad.down ? '\x19' : ' ';
-  inp += pad.left ? '\x1B' : ' ';
-  inp += pad.right ? '\x1A' : ' ';
-
-  inp += (pad.cUp || pad.cDown || pad.cLeft || pad.cRight) ? 'c' : ' ';
-  inp += pad.cUp ? '\x18' : ' ';
-  inp += pad.cDown ? '\x19' : ' ';
-  inp += pad.cLeft ? '\x1B' : ' ';
-  inp += pad.cRight ? '\x1A' : ' ';
-
-  drawText(inp, x, y);
-}
-
 function drawPauseScreen() {
-  drawRect(0, 32, 640, 2, 1, 1, 1, 1);
-  drawCentered('Menu', 640 / 2, 35);
+  drawRect(0, 37, 640, 2, 1, 1, 1, 1);
+  drawCentered('Menu', 640 / 2, 40);
 
   mainMenu.handleInput(pads[0]);
   mainMenu.draw();

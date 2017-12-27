@@ -16,9 +16,9 @@ declare function setTextColor(r: number, g: number, b: number, a: number): void;
 
 declare function readPads(): PADInfo[]
 
-declare function getGameState(): CGameState;
+declare function getGameState(): CGameState | null;
 
-declare function getPlayer(): CPlayer;
+declare function getPlayer(): CPlayer | null;
 
 declare function isPauseScreen(): boolean;
 
@@ -35,6 +35,8 @@ declare function drawVertex(x: number, y: number, z: number): void;
 declare function OSReport(msg: string): void;
 
 declare function require<T>(path: string): T;
+
+declare function getWorld(): CWorld | null;
 
 interface Global {
   onFrame(): void;
@@ -73,10 +75,17 @@ interface PADButtonInfo<T> {
   cRight: T;
 }
 
+interface PadButtonInfoAnalog<T> extends PADButtonInfo<T> {
+  stickX: number;
+  stickY: number;
+  cX: number;
+  cY: number;
+}
+
 interface PADInfo {
   digital: PADButtonInfo<boolean>;
   pressed: PADButtonInfo<boolean>;
-  analog: PADButtonInfo<number>;
+  analog: PadButtonInfoAnalog<number>;
 }
 
 interface CGameState {
@@ -86,6 +95,10 @@ interface CGameState {
 interface CPlayer {
   speed: CVector3f;
   rotation: CVector3f;
+}
+
+interface CWorld {
+  area: number;
 }
 
 interface Number {

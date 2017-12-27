@@ -2,6 +2,11 @@ const CHAR_DIM = 8;
 const LINE_PADDING = 2;
 const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
 
+enum OnSelectResult {
+  DO_NOTHING = 1,
+  DESELECT
+}
+
 export class Menu {
   cursor = 0;
   x = 0;
@@ -9,6 +14,7 @@ export class Menu {
   hasSelected = false;
   active = false;
   parent: MenuItem | null;
+  private scrollTimer = 0;
 
   constructor(private items: MenuItem[], x: number, y: number) {
     for (const item of items) {
@@ -21,6 +27,16 @@ export class Menu {
     this.active = false;
   }
 
+  select(index: number): OnSelectResult {
+    this.cursor = index;
+    this.hasSelected = true;
+    return this.items[this.cursor].onSelect() || OnSelectResult.DESELECT;
+  }
+
+  deselect(): void {
+    this.hasSelected = false;
+  }
+
   toString(): string {
     return '[Menu len ' + this.items.length + ']';
   }
@@ -29,72 +45,101 @@ export class Menu {
     if (!this.active) {
       return;
     }
+    let yOff = 0;
+    const SCROLL_OFF = 30;
+    if (this.cursor > SCROLL_OFF) {
+      yOff = (this.cursor - SCROLL_OFF) * -LINE_HEIGHT
+    }
     for (let i = 0; i < this.items.length; i++) {
       if (this.cursor == i) {
-        setTextColor(1, 1, 1, 1);
+        if (this.hasSelected) {
+          setTextColor(0.7, 0.7, 1, 1);
+        } else {
+          setTextColor(1, 1, 1, 1);
+        }
       } else {
-        setTextColor(0.5, 0.5, 0.5, 1);
+        setTextColor(0.4, 0.4, 0.4, 1);
       }
-      this.items[i].draw(this.x, this.y + i * (CHAR_DIM + LINE_PADDING));
+      this.items[i].draw(this.x, this.y + i * (CHAR_DIM + LINE_PADDING) + yOff);
     }
   }
 
-  handleInput(pad: PADInfo): void {
+  handleInput(pad: PADInfo): boolean {
     if (this.hasSelected) {
-      this.items[this.cursor].handleInput(pad);
-      return;
+      return this.items[this.cursor].handleInput(pad);
     }
-    if (pad.pressed.down || pad.pressed.stickDown) {
+    if (this.scrollTimer > 0) {
+      this.scrollTimer--;
+    }
+    if (pad.pressed.down || pad.pressed.stickDown || pad.pressed.cDown) {
       this.nextItem();
+      this.scrollTimer = 15;
     }
-    if (pad.pressed.up || pad.pressed.stickUp) {
+    if (pad.pressed.up || pad.pressed.stickUp || pad.pressed.cUp) {
       this.prevItem();
+      this.scrollTimer = 15;
+    }
+    if (pad.pressed.left || pad.pressed.stickLeft || pad.pressed.cLeft || pad.pressed.lDigital) {
+      this.cursor -= 4;
+      this.prevItem();
+      this.scrollTimer = 15;
+    }
+    if (pad.pressed.right || pad.pressed.stickRight || pad.pressed.cRight || pad.pressed.rDigital) {
+      this.cursor += 4;
+      this.nextItem();
+      this.scrollTimer = 15;
+    }
+    if (pad.digital.down || pad.digital.stickDown || pad.digital.cDown) {
+      if (this.scrollTimer <= 0) {
+        this.nextItem();
+        this.scrollTimer = 4;
+      }
+    }
+    if (pad.digital.up || pad.digital.stickUp || pad.digital.cUp) {
+      if (this.scrollTimer <= 0) {
+        this.prevItem();
+        this.scrollTimer = 4;
+      }
     }
     if (pad.pressed.a) {
-      this.hasSelected = true;
-      this.items[this.cursor].onSelect();
+      const result = this.select(this.cursor);
+      switch (result) {
+        case OnSelectResult.DESELECT:
+          this.deselect();
+          break;
+        case OnSelectResult.DO_NOTHING:
+        default:
+          break;
+      }
     }
+    return true;
   }
 
   nextItem(): void {
     this.cursor++;
-    if (this.cursor >= this.items.length) {
-      this.cursor = 0;
+    while (this.cursor >= this.items.length) {
+      this.cursor -= this.items.length;
     }
   }
 
   prevItem(): void {
     this.cursor--;
-    if (this.cursor < 0) {
-      this.cursor = this.items.length - 1;
+    while (this.cursor < 0) {
+      this.cursor += this.items.length;
     }
   }
 }
 
-export type OnSelectCallback = () => void;
+export type OnSelectCallback = (this: MenuItem) => OnSelectResult | void;
 
 export class MenuItem {
-  onSelect: OnSelectCallback;
-  submenu: Menu;
+  onSelectCB: OnSelectCallback;
   parent: Menu;
 
-  constructor(private name: string, onSelectOrSubmenu?: OnSelectCallback | Menu) {
+  constructor(public name: string, onSelect?: OnSelectCallback) {
     this.name = name;
-    if (typeof onSelectOrSubmenu == 'function') {
-      this.onSelect = onSelectOrSubmenu;
-    } else if (onSelectOrSubmenu instanceof Menu) {
-      OSReport('Selected a submenu');
-      this.submenu = onSelectOrSubmenu;
-      this.submenu.parent = this;
-      this.onSelect = function onSelect() {
-        this.submenu.active = true;
-        this.submenu.hasSelected = false;
-      }
-    } else {
-      this.onSelect = function onSelect() {
-        this.parent.hasSelected = false;
-      }
-    }
+    this.onSelectCB = onSelect || (() => {
+    });
   }
 
   toString(): string {
@@ -103,20 +148,52 @@ export class MenuItem {
 
   draw(x: number, y: number) {
     drawText(this.name, x, y);
+  }
+
+  handleInput(pad: PADInfo): boolean {
+    return true;
+  }
+
+  onSelect(): OnSelectResult | void {
+    return this.onSelectCB.call(this);
+  }
+}
+
+export class MenuItemSubmenu extends MenuItem {
+  submenu: Menu;
+
+  constructor(name: string, submenu: Menu) {
+    super(name);
+
+    this.submenu = submenu;
+    this.submenu.parent = this;
+  }
+
+  onSelect(): OnSelectResult {
+    this.submenu.active = true;
+    this.submenu.deselect();
+    return OnSelectResult.DO_NOTHING;
+  }
+
+  draw(x: number, y: number) {
+    super.draw(x, y);
     if (this.submenu) {
       this.submenu.draw();
     }
   }
 
-  handleInput(pad: PADInfo) {
-    if (this.submenu) {
-      if (pad.pressed.b) {
-        this.submenu.active = false;
-        this.submenu.hasSelected = false;
-        this.parent.hasSelected = false;
-      } else {
-        this.submenu.handleInput(pad);
-      }
+  handleInput(pad: PADInfo): boolean {
+    super.handleInput(pad);
+    if (!this.submenu.handleInput(pad)) {
+      return false;
     }
+    if (pad.pressed.b) {
+      this.submenu.active = false;
+      this.submenu.deselect();
+      this.parent.deselect();
+      OSReport("Deselecting a menu");
+      return false;
+    }
+    return true;
   }
 }

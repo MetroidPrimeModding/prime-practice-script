@@ -5,6 +5,7 @@ import {drawIGT} from "./drawIGT";
 import {drawPlayerSpeed} from "./drawPlayerSpeed";
 import {drawRoomTimers} from "./drawRoomTimers";
 import {CONFIG, CONFIG_MENU} from "./config";
+import {INVENTORY_MENU} from "./inventory";
 
 enum GXPrimitive {
   GX_POINTS = 0xB8,
@@ -20,14 +21,9 @@ const CHAR_DIM = 8;
 const LINE_PADDING = 2;
 const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
 
-let pads: PADInfo[];
-let gameState: CGameState | null;
-let player: CPlayer | null;
-let world: CWorld | null;
-
 const mainMenu = new Menu([
   new MenuItem('Room Options [soon]'),
-  new MenuItem('Inventory [soon]'),
+  new MenuItemSubmenu('Inventory', INVENTORY_MENU),
   new MenuItem('Cheats [soon]'),
   new MenuItemSubmenu('Warp', WARP_MENU),
   new MenuItem('Reload [soon]'),
@@ -41,25 +37,25 @@ mainMenu.active = true;
 global.onFrame = function () {
   try {
     // Don't repeat if we don't need to
-    pads = readPads();
-    gameState = getGameState();
-    player = getPlayer();
-    world = getWorld();
+    global.pads = readPads();
+    global.gameState = getGameState();
+    global.player = getPlayer();
+    global.world = getWorld();
 
     setTextColor(1, 1, 1, 1);
     let y = 10;
     if (CONFIG.showInput) {
       drawText('Prime Practice Mod', 10, y);
-      drawIGT(gameState, 165, 10);
-      drawInputs(pads[0], 275, 10);
+      drawIGT(global.gameState, 165, 10);
+      drawInputs(global.pads[0], 275, 10);
       y += LINE_HEIGHT;
     }
     if (CONFIG.showSpeed) {
-      drawPlayerSpeed(player, 10, y);
+      drawPlayerSpeed(global.player, 10, y);
       y += LINE_HEIGHT;
     }
     if (CONFIG.showRoomTimers) {
-      drawRoomTimers(gameState, world, 10, y);
+      drawRoomTimers(global.gameState, global.world, 10, y);
       y += LINE_HEIGHT;
     }
 
@@ -68,7 +64,9 @@ global.onFrame = function () {
     }
     setTextColor(1, 1, 1, 1);
 
-    if (pads[0].digital.lDigital && pads[0].digital.rDigital && pads[0].pressed.start) {
+    if (global.pads[0].digital.lDigital
+      && global.pads[0].digital.rDigital
+      && global.pads[0].pressed.start) {
       nativeRequire('/mod.js');
     }
 
@@ -95,7 +93,7 @@ function drawPauseScreen() {
   drawRect(0, 37, 640, 2, 1, 1, 1, 1);
   drawCentered('Menu', 640 / 2, 40);
 
-  mainMenu.handleInput(pads[0]);
+  mainMenu.handleInput(global.pads[0]);
   mainMenu.draw();
 }
 

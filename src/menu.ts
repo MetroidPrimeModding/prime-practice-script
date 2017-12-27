@@ -2,7 +2,7 @@ const CHAR_DIM = 8;
 const LINE_PADDING = 2;
 const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
 
-enum OnSelectResult {
+export enum OnSelectResult {
   DO_NOTHING = 1,
   DESELECT
 }

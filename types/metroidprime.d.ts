@@ -38,8 +38,14 @@ declare function require<T>(path: string): T;
 
 declare function getWorld(): CWorld | null;
 
+declare function setInventory(player: CPlayer): void;
+
 interface Global {
   onFrame(): void;
+  pads: PADInfo[];
+  gameState: CGameState | null;
+  player: CPlayer | null;
+  world: CWorld | null;
 }
 
 interface CVector3f {
@@ -95,6 +101,10 @@ interface CGameState {
 interface CPlayer {
   speed: CVector3f;
   rotation: CVector3f;
+  itemAmount: number[]
+  itemCapacity: number[];
+  health: number;
+  currentSuit: number;
 }
 
 interface CWorld {

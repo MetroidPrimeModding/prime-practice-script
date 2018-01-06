@@ -42,6 +42,7 @@ declare function setInventory(player: CPlayer): void;
 
 interface Global {
   onFrame(): void;
+  onInput(): void;
   pads: PADInfo[];
   gameState: CGameState | null;
   player: CPlayer | null;

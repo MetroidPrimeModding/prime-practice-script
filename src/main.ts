@@ -37,7 +37,6 @@ mainMenu.active = true;
 global.onFrame = function () {
   try {
     // Don't repeat if we don't need to
-    global.pads = readPads();
     global.gameState = getGameState();
     global.player = getPlayer();
     global.world = getWorld();
@@ -64,17 +63,25 @@ global.onFrame = function () {
     }
     setTextColor(1, 1, 1, 1);
 
-    if (global.pads[0].digital.lDigital
-      && global.pads[0].digital.rDigital
-      && global.pads[0].pressed.start) {
-      nativeRequire('/mod.js');
-    }
-
   } catch (error) {
     setTextColor(1, 0, 0, 1);
     drawText('Error: ' + error + error.stack, 5, 100);
   }
   Duktape.gc();
+};
+
+global.onInput = function() {
+  global.pads = readPads();
+
+  if (isPauseScreen()) {
+    mainMenu.handleInput(global.pads[0]);
+  }
+
+  if (global.pads[0].digital.lDigital
+    && global.pads[0].digital.rDigital
+    && global.pads[0].pressed.start) {
+    nativeRequire('/mod.js');
+  }
 };
 
 Number.prototype.formatNumber = function (len, decimal, filler) {
@@ -93,7 +100,6 @@ function drawPauseScreen() {
   drawRect(0, 37, 640, 2, 1, 1, 1, 1);
   drawCentered('Menu', 640 / 2, 40);
 
-  mainMenu.handleInput(global.pads[0]);
   mainMenu.draw();
 }
 

@@ -43,7 +43,19 @@ const config = {
           mangle: {
             properties: false
           },
-          compress: true
+          compress: {
+            passes: 3,
+            toplevel: true,
+            pure_funcs: [
+              'OSReport'
+            ],
+            global_defs: {
+              DEBUG: false
+            }
+          },
+          // output: {
+          //   beautify: true
+          // },
         }
       })
     ])

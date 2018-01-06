@@ -46,7 +46,9 @@ global.onFrame = function () {
     if (CONFIG.showInput) {
       drawText('Prime Practice Mod', 10, y);
       drawIGT(global.gameState, 165, 10);
-      drawInputs(global.pads[0], 275, 10);
+      if (global.pads) {
+        drawInputs(global.pads[0], 275, 10);
+      }
       y += LINE_HEIGHT;
     }
     if (CONFIG.showSpeed) {
@@ -72,6 +74,9 @@ global.onFrame = function () {
 
 global.onInput = function() {
   global.pads = readPads();
+  if (!global.pads[0]) {
+    return;
+  }
 
   if (isPauseScreen()) {
     mainMenu.handleInput(global.pads[0]);
@@ -80,7 +85,7 @@ global.onInput = function() {
   if (global.pads[0].digital.lDigital
     && global.pads[0].digital.rDigital
     && global.pads[0].pressed.start) {
-    nativeRequire('/mod.js');
+    nativeRequire('/mod.js')();
   }
 };
 

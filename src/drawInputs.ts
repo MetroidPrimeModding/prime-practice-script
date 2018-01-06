@@ -1,4 +1,8 @@
 export function drawInputs(pad: PADInfo, x: number, y: number) {
+  if (!pad) {
+    return;
+  }
+
   let inp = '';
   inp += pad.digital.stickUp ? '\x18' : ' ';
   inp += pad.digital.stickDown ? '\x19' : ' ';

@@ -28,11 +28,6 @@ export class MemoryMenuItem extends MenuItem {
       ...FLOAT_MEMORY_MENU_ITEM_DEFAULT_OPTIONS,
       ...opts
     };
-    let msg = 'name: ' + name;
-    for (let key in this.opts) {
-      msg += `${key}:${(this.opts as any)[key]},`;
-    }
-    OSReport(msg);
   }
 
   draw(x: number, y: number) {

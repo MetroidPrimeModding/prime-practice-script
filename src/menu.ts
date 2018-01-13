@@ -201,7 +201,6 @@ export class MenuItemSubmenu extends MenuItem {
       this.submenu.active = false;
       this.submenu.deselect();
       this.parent.deselect();
-      OSReport("Deselecting a menu");
       return false;
     }
     return true;

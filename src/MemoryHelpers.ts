@@ -34,10 +34,8 @@ export function readBits(addr: number, start: number, count: number): number {
 }
 
 export function writeBits(addr: number, start: number, count: number, val: number) {
-  OSReport(`${addr.toString(16)} ${start} ${count} ${val}`);
   for (let i = 0; i < count; i++) {
     let bit = (val >> i) & 0x1;
     writeBit(addr, start + i, bit);
-    OSReport(`${addr} ${start + i}, ${bit}`);
   }
 }

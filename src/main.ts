@@ -6,24 +6,13 @@ import {drawPlayerSpeed} from "./drawPlayerSpeed";
 import {drawRoomTimers} from "./drawRoomTimers";
 import {CONFIG, CONFIG_MENU} from "./config";
 import {INVENTORY_MENU} from "./inventory";
-
-enum GXPrimitive {
-  GX_POINTS = 0xB8,
-  GX_LINES = 0xA8,
-  GX_LINESTRIP = 0xB0,
-  GX_TRIANGLES = 0x90,
-  GX_TRIANGLESTRIP = 0x98,
-  GX_TRIANGLEFAN = 0xA0,
-  GX_QUADS = 0x80,
-}
-
-const CHAR_DIM = 8;
-const LINE_PADDING = 2;
-const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
+import {CHAR_DIM, GXPrimitive, LINE_HEIGHT, PAUSE_MENU_OFFSET} from "./constants";
+import {PLAYER_MENU} from "./player";
 
 const mainMenu = new Menu([
   new MenuItem('Room Options [soon]'),
   new MenuItemSubmenu('Inventory', INVENTORY_MENU),
+  new MenuItemSubmenu('Player', PLAYER_MENU),
   new MenuItem('Cheats [soon]'),
   new MenuItemSubmenu('Warp', WARP_MENU),
   new MenuItem('Reload [soon]'),
@@ -31,7 +20,7 @@ const mainMenu = new Menu([
   new MenuItem('Change Layer [soon]'),
   new MenuItemSubmenu('Config', CONFIG_MENU),
   ...(DEBUG ? [new MenuItem('Reload scripts', () => nativeRequire('/mod.js'))] : [])
-], 10, 60);
+], 10, PAUSE_MENU_OFFSET);
 mainMenu.active = true;
 
 global.onFrame = function () {
@@ -72,7 +61,7 @@ global.onFrame = function () {
   Duktape.gc();
 };
 
-global.onInput = function() {
+global.onInput = function () {
   global.pads = readPads();
   if (!global.pads[0]) {
     return;

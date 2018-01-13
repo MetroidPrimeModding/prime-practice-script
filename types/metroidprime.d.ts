@@ -1,13 +1,3 @@
-declare enum GXPrimitive {
-  GX_POINTS = 0xB8,
-  GX_LINES = 0xA8,
-  GX_LINESTRIP = 0xB0,
-  GX_TRIANGLES = 0x90,
-  GX_TRIANGLESTRIP = 0x98,
-  GX_TRIANGLEFAN = 0xA0,
-  GX_QUADS = 0x80,
-}
-
 declare function nativeRequire(path: string): any;
 
 declare function drawText(str: string, x: number, y: number): void;
@@ -24,7 +14,7 @@ declare function isPauseScreen(): boolean;
 
 declare function warp(worldID: number, areaID: number): void;
 
-declare function drawBegin(primitive: GXPrimitive): void;
+declare function drawBegin(primitive: number): void;
 
 declare function drawEnd(): void;
 
@@ -40,9 +30,28 @@ declare function getWorld(): CWorld | null;
 
 declare function setInventory(player: CPlayer): void;
 
+declare function readU32(addr: number): number;
+
+declare function readS32(addr: number): number;
+
+declare function readFloat(addr: number): number;
+
+declare function readDouble(addr: number): number;
+
+declare function writeU32(addr: number, value: number): number;
+
+declare function writeS32(addr: number, value: number): number;
+
+declare function writeFloat(addr: number, value: number): number;
+
+declare function writeDouble(addr: number, value: number): number;
+
+
 interface Global {
   onFrame(): void;
+
   onInput(): void;
+
   pads: PADInfo[];
   gameState: CGameState | null;
   player: CPlayer | null;
@@ -102,6 +111,7 @@ interface CGameState {
 }
 
 interface CPlayer {
+  address: number;
   speed: CVector3f;
   rotation: CVector3f;
   itemAmount: number[]

@@ -1,4 +1,5 @@
 import {Menu, MenuItem} from "./menu";
+import {MENU_2_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
 
 export let CONFIG = {
   showSpeed: true,
@@ -31,4 +32,4 @@ export const CONFIG_MENU = new Menu([
       this.name = 'HUD: Show Input'
     }
   })
-], 170, 50);
+], MENU_2_OFFSET_X, PAUSE_MENU_OFFSET);

@@ -1,9 +1,7 @@
 import {Menu, MenuItem, OnSelectResult} from "./menu";
+import {MENU_2_OFFSET_X, MENU_3_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
 
-const CHAR_DIM = 8;
-const LINE_PADDING = 2;
 let fusionSuit = false;
-const ITEM_COUNT_OFFSET = 130;
 
 interface InventoryItem {
   index: number
@@ -80,7 +78,7 @@ class MenuItemInventoryItem extends MenuItem {
       amt = global.player.itemAmount[this.index];
       cap = global.player.itemCapacity[this.index]
     }
-    drawText(`${amt}/${cap}`, x + ITEM_COUNT_OFFSET, y);
+    drawText(`${amt}/${cap}`, MENU_3_OFFSET_X, y);
   }
 
   onSelect() {
@@ -160,7 +158,7 @@ class MenuItemHealth extends MenuItem {
     if (global.player) {
       amt = global.player.health;
     }
-    drawText(`${amt}`, x + ITEM_COUNT_OFFSET, y);
+    drawText(`${amt}`, MENU_3_OFFSET_X, y);
   }
 
   onSelect() {
@@ -213,16 +211,16 @@ class MenuItemHealth extends MenuItem {
 }
 
 class MenuItemFusionSuit extends MenuItem {
-  constructor(name: string ) {
+  constructor(name: string) {
     super(name);
   }
 
   draw(x: number, y: number) {
     super.draw(x, y);
     if (fusionSuit) {
-      drawText('On', x + ITEM_COUNT_OFFSET, y);
+      drawText('On', MENU_3_OFFSET_X, y);
     } else {
-      drawText('Off', x + ITEM_COUNT_OFFSET, y);
+      drawText('Off', MENU_3_OFFSET_X, y);
     }
   }
 
@@ -244,7 +242,7 @@ export const INVENTORY_MENU = new Menu([
     .filter((v) => !v.hide)
     .map((v) => new MenuItemInventoryItem(v.name, v.max || 1, v.step || 1, v.index))),
   new MenuItemFusionSuit('Fusion Suit')
-], 170, 50);
+], MENU_2_OFFSET_X, PAUSE_MENU_OFFSET);
 
 function updateSuit() {
   if (!global.player) {

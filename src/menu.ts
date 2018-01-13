@@ -1,6 +1,4 @@
-const CHAR_DIM = 8;
-const LINE_PADDING = 2;
-const LINE_HEIGHT = CHAR_DIM + LINE_PADDING;
+import {CHAR_DIM, LINE_HEIGHT, LINE_PADDING} from "./constants";
 
 export enum OnSelectResult {
   DO_NOTHING = 1,
@@ -139,12 +137,13 @@ export class Menu {
 }
 
 export type OnSelectCallback = (this: MenuItem) => OnSelectResult | void;
+export type OnDrawCallback = (this: MenuItem) => void;
 
 export class MenuItem {
   onSelectCB: OnSelectCallback;
   parent: Menu;
 
-  constructor(public name: string, onSelect?: OnSelectCallback) {
+  constructor(public name: string, onSelect?: OnSelectCallback, private onDraw?: OnDrawCallback) {
     this.name = name;
     this.onSelectCB = onSelect || (() => {
     });
@@ -155,6 +154,9 @@ export class MenuItem {
   }
 
   draw(x: number, y: number) {
+    if (this.onDraw) {
+      this.onDraw.call(this);
+    }
     drawText(this.name, x, y);
   }
 

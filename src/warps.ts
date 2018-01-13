@@ -1,4 +1,5 @@
 import {Menu, MenuItem, MenuItemSubmenu} from "./menu";
+import {MENU_2_OFFSET_X, MENU_3_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
 
 export const WARPS = [
   {
@@ -323,7 +324,7 @@ export const WARPS = [
 const WORLD_MENUS = WARPS.map(world =>
   new MenuItemSubmenu(world.name, new Menu(world.warps.map(currentWarp => {
     return new MenuItem(currentWarp.name, () => warp(world.world, currentWarp.area));
-  }), 310, 50))
+  }), MENU_3_OFFSET_X, PAUSE_MENU_OFFSET))
 );
 
-export const WARP_MENU = new Menu(WORLD_MENUS, 170, 50);
+export const WARP_MENU = new Menu(WORLD_MENUS, MENU_2_OFFSET_X, PAUSE_MENU_OFFSET);

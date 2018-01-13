@@ -33,6 +33,22 @@ const config = {
   },
   plugins: [
     ...(dev ? [
+      new UglifyJsPlugin({
+        uglifyOptions: {
+          ecma: 5,
+          mangle: false,
+          compress: {
+            passes: 3,
+            toplevel: true,
+            global_defs: {
+              DEBUG: true
+            }
+          },
+          output: {
+            beautify: true
+          },
+        }
+      }),
       new PadWithNullsPlugin({
         len: 100 * 1024
       })

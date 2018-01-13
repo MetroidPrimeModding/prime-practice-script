@@ -79,7 +79,7 @@ export class Menu {
       this.prevItem();
       this.scrollTimer = 15;
     }
-    if (pad.pressed.left || pad.pressed.stickLeft || pad.pressed.cLeft || pad.pressed.lDigital) {
+    if (pad.pressed.left || pad.pressed.stickLeft || pad.pressed.cLeft) {
       this.cursor -= 4;
       this.prevItem();
       this.scrollTimer = 15;
@@ -87,6 +87,14 @@ export class Menu {
     if (pad.pressed.right || pad.pressed.stickRight || pad.pressed.cRight || pad.pressed.rDigital) {
       this.cursor += 4;
       this.nextItem();
+      this.scrollTimer = 15;
+    }
+    if (pad.pressed.lDigital) {
+      this.cursor = 0;
+      this.scrollTimer = 15;
+    }
+    if (pad.pressed.rDigital) {
+      this.cursor = this.items.length - 1;
       this.scrollTimer = 15;
     }
     if (pad.digital.down || pad.digital.stickDown || pad.digital.cDown) {

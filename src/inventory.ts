@@ -2,6 +2,8 @@ import {Menu, MenuItem, OnSelectResult} from "./menu";
 
 const CHAR_DIM = 8;
 const LINE_PADDING = 2;
+let fusionSuit = false;
+const ITEM_COUNT_OFFSET = 130;
 
 interface InventoryItem {
   index: number
@@ -64,7 +66,6 @@ const INVENTORY_ITEMS: InventoryItem[] = [
   {index: 40, name: 'ArtifactOfNewborn', hide: true},
 ];
 
-const TWENTY_ONE_PERCENT = [];
 
 class MenuItemInventoryItem extends MenuItem {
   constructor(name: string, readonly max: number, readonly step: number, readonly index: number) {
@@ -79,7 +80,7 @@ class MenuItemInventoryItem extends MenuItem {
       amt = global.player.itemAmount[this.index];
       cap = global.player.itemCapacity[this.index]
     }
-    drawText(`${amt}/${cap}`, x + (this.name.length + 1) * CHAR_DIM, y);
+    drawText(`${amt}/${cap}`, x + ITEM_COUNT_OFFSET, y);
   }
 
   onSelect() {
@@ -97,6 +98,7 @@ class MenuItemInventoryItem extends MenuItem {
       }
       global.player.itemCapacity[this.index] = amt;
       global.player.itemAmount[this.index] = amt;
+      updateSuit();
       setInventory(global.player);
 
       return OnSelectResult.DESELECT;
@@ -158,7 +160,7 @@ class MenuItemHealth extends MenuItem {
     if (global.player) {
       amt = global.player.health;
     }
-    drawText(`${amt}`, x + (this.name.length + 1) * CHAR_DIM, y);
+    drawText(`${amt}`, x + ITEM_COUNT_OFFSET, y);
   }
 
   onSelect() {
@@ -210,10 +212,72 @@ class MenuItemHealth extends MenuItem {
   }
 }
 
+class MenuItemFusionSuit extends MenuItem {
+  constructor(name: string ) {
+    super(name);
+  }
+
+  draw(x: number, y: number) {
+    super.draw(x, y);
+    if (fusionSuit) {
+      drawText('On', x + ITEM_COUNT_OFFSET, y);
+    } else {
+      drawText('Off', x + ITEM_COUNT_OFFSET, y);
+    }
+  }
+
+  onSelect() {
+    if (!global.player) {
+      return OnSelectResult.DESELECT;
+    }
+    fusionSuit = !fusionSuit;
+    updateSuit();
+    setInventory(global.player);
+
+    return OnSelectResult.DESELECT;
+  }
+}
+
 export const INVENTORY_MENU = new Menu([
   new MenuItemHealth('Health'),
   ...(INVENTORY_ITEMS
     .filter((v) => !v.hide)
     .map((v) => new MenuItemInventoryItem(v.name, v.max || 1, v.step || 1, v.index))),
+  new MenuItemFusionSuit('Fusion Suit')
 ], 170, 50);
 
+function updateSuit() {
+  if (!global.player) {
+    return;
+  }
+
+  const varia = (global.player.itemAmount[22] + global.player.itemCapacity[22]) > 0;
+  const gravity = (global.player.itemAmount[21] + global.player.itemCapacity[21]) > 0;
+  const phazon = (global.player.itemAmount[23] + global.player.itemCapacity[23]) > 0;
+
+  if (phazon) {
+    if (fusionSuit) {
+      global.player.currentSuit = 7;
+    } else {
+      global.player.currentSuit = 3;
+    }
+  } else if (gravity) {
+    if (fusionSuit) {
+      global.player.currentSuit = 5;
+    } else {
+      global.player.currentSuit = 1;
+    }
+  } else if (varia) {
+    if (fusionSuit) {
+      global.player.currentSuit = 6;
+    } else {
+      global.player.currentSuit = 2;
+    }
+  } else {
+    if (fusionSuit) {
+      global.player.currentSuit = 4;
+    } else {
+      global.player.currentSuit = 0;
+    }
+  }
+}

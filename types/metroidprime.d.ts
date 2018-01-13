@@ -49,6 +49,8 @@ interface Global {
   world: CWorld | null;
 }
 
+declare var DEBUG: boolean;
+
 interface CVector3f {
   x: number;
   y: number;

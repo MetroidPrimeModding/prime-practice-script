@@ -30,7 +30,7 @@ const mainMenu = new Menu([
   new MenuItem('Save [soon]'),
   new MenuItem('Change Layer [soon]'),
   new MenuItemSubmenu('Config', CONFIG_MENU),
-  new MenuItem('Reload scripts', () => nativeRequire('/mod.js'))
+  ...(DEBUG ? [new MenuItem('Reload scripts', () => nativeRequire('/mod.js'))] : [])
 ], 10, 60);
 mainMenu.active = true;
 

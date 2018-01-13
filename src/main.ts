@@ -48,6 +48,9 @@ global.onFrame = function () {
       drawRoomTimers(global.gameState, global.world, 10, y);
       y += LINE_HEIGHT;
     }
+    if (CONFIG.showFPS) {
+      drawFPS(610, 452);
+    }
 
     if (isPauseScreen()) {
       drawPauseScreen()
@@ -115,4 +118,8 @@ function drawRect(x: number, y: number, w: number, h: number, r: number, g: numb
   drawEnd();
 }
 
+function drawFPS(x: number, y: number) {
+  let fps = getFPS();
+  drawText(Math.round(fps).toFixed(0), x, y);
+}
 

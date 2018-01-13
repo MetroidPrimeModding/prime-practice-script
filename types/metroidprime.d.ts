@@ -46,6 +46,7 @@ declare function writeFloat(addr: number, value: number): number;
 
 declare function writeDouble(addr: number, value: number): number;
 
+declare function getFPS(): number;
 
 interface Global {
   onFrame(): void;

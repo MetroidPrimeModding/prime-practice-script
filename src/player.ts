@@ -1,7 +1,7 @@
 import {MemoryEnumMenuItem, MemoryFloatMenuItem, MemoryMenuItem, MemoryU32MenuItem} from "./MemoryMenuItems";
 import {Menu, MenuItem} from "./menu";
-import {MENU_2_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
-import {readArray, writeArray} from "./MemoryHelpers";
+import {MENU_2_OFFSET_X, MENU_3_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
+import {readArray, readBits, writeArray, writeBit, writeBits} from "./MemoryHelpers";
 
 function playerPlusOffset(offset: number) {
   return () => {
@@ -16,6 +16,8 @@ let savedPos: number[];
 let savedVelocity: number[];
 let savedAngularVelocity: number[];
 let savedOrientation: number[];
+let savedFreeLookYaw: number;
+let savedFreeLookPitch: number;
 
 export const POSITION_MENU_ITEMS = [
   new MenuItem('', () => {
@@ -35,6 +37,8 @@ export const POSITION_MENU_ITEMS = [
     savedVelocity = readArray(playerPlusOffset(0x138)(), 3, readFloat);
     savedAngularVelocity = readArray(playerPlusOffset(0x144)(), 3, readFloat);
     savedOrientation = readArray(playerPlusOffset(0x200)(), 4, readFloat);
+    savedFreeLookYaw = readFloat(playerPlusOffset(0x3E4)());
+    savedFreeLookPitch = readFloat(playerPlusOffset(0x3EC)());
   }),
   new MenuItem('Load Position', () => {
     if (!savedPos) {
@@ -44,6 +48,8 @@ export const POSITION_MENU_ITEMS = [
     writeArray(playerPlusOffset(0x138)(), savedVelocity, writeFloat);
     writeArray(playerPlusOffset(0x144)(), savedAngularVelocity, writeFloat);
     writeArray(playerPlusOffset(0x200)(), savedOrientation, writeFloat);
+    writeFloat(playerPlusOffset(0x3E4)(), savedFreeLookYaw);
+    writeFloat(playerPlusOffset(0x3EC)(), savedFreeLookPitch);
   }),
   new MemoryFloatMenuItem('X', playerPlusOffset(0x34 + 0xC), {
     step: 1
@@ -58,6 +64,37 @@ export const POSITION_MENU_ITEMS = [
 
 
 export const STATE_MENU_ITEMS = [
+  new MenuItem('Floaty Jump', () => {
+    let dist = readFloat(playerPlusOffset(0x828)());
+    let wc = readBits(playerPlusOffset(0xe4)(), 14, 3);
+    if (wc > 0 && dist > 2) {
+      wc = 0;
+      dist = 0;
+    } else {
+      wc = 1;
+      dist = 20;
+    }
+    writeFloat(playerPlusOffset(0x828)(), dist);
+    writeBits(playerPlusOffset(0xe4)(), 14, 3, wc);
+  }, (x, y) => {
+    let dist = readFloat(playerPlusOffset(0x828)());
+    let wc = readBits(playerPlusOffset(0xe4)(), 14, 3);
+    if (wc > 0 && dist > 2) {
+      drawText('On', MENU_3_OFFSET_X, y)
+    } else {
+      drawText('Off', MENU_3_OFFSET_X, y)
+    }
+  }),
+  new MemoryFloatMenuItem('Distance under water', playerPlusOffset(0x828)),
+  new MemoryMenuItem('Fluid Counter', playerPlusOffset(0xe4),
+    (addr) => readBits(addr, 14, 3),
+    (addr, val) => writeBits(addr, 14, 3, val),
+    {
+      min: 0,
+      max: 3,
+      hex: true
+    }
+  ),
   new MemoryEnumMenuItem('Jump State', playerPlusOffset(0x258), [
     'OnGround',
     'Jump',

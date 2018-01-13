@@ -137,7 +137,7 @@ export class Menu {
 }
 
 export type OnSelectCallback = (this: MenuItem) => OnSelectResult | void;
-export type OnDrawCallback = (this: MenuItem) => void;
+export type OnDrawCallback = (this: MenuItem, x: number, y: number) => void;
 
 export class MenuItem {
   onSelectCB: OnSelectCallback;
@@ -155,7 +155,7 @@ export class MenuItem {
 
   draw(x: number, y: number) {
     if (this.onDraw) {
-      this.onDraw.call(this);
+      this.onDraw.call(this, x, y);
     }
     drawText(this.name, x, y);
   }

@@ -1,5 +1,6 @@
 import {MenuItem, OnSelectResult} from "./menu";
 import {CHAR_DIM, MENU_3_OFFSET_X} from "./constants";
+import {readBit, writeBit} from "./MemoryHelpers";
 
 interface MemoryMenuItemOptions {
   step: number;
@@ -20,13 +21,18 @@ export class MemoryMenuItem extends MenuItem {
   constructor(name: string,
               public address: () => number,
               public readFn: (addr: number) => number,
-              public writeFn: (addr: number, val: number) => number,
+              public writeFn: (addr: number, val: number) => void,
               opts: Partial<MemoryMenuItemOptions> = {}) {
     super(name);
     this.opts = {
       ...FLOAT_MEMORY_MENU_ITEM_DEFAULT_OPTIONS,
       ...opts
+    };
+    let msg = 'name: ' + name;
+    for (let key in this.opts) {
+      msg += `${key}:${(this.opts as any)[key]},`;
     }
+    OSReport(msg);
   }
 
   draw(x: number, y: number) {
@@ -247,5 +253,33 @@ export class MemoryEnumMenuItem extends MenuItem {
       this.write(val);
     }
     return true;
+  }
+}
+
+export class MemoryBitMenuItem extends MenuItem {
+  constructor(name: string,
+              public address: () => number,
+              public bit: number,
+              writable: boolean = true) {
+    super(name);
+  }
+
+  draw(x: number, y: number) {
+    super.draw(x, y);
+    let val = this.read();
+    drawText(val ? 'On' : 'Off', MENU_3_OFFSET_X, y);
+  }
+
+  read(): boolean {
+    return readBit(this.address(), this.bit) > 0;
+  }
+
+  write(state: boolean) {
+    writeBit(this.address(), this.bit, state ? 1 : 0);
+  }
+
+  onSelect() {
+    this.write(!this.read());
+    return OnSelectResult.DO_NOTHING;
   }
 }

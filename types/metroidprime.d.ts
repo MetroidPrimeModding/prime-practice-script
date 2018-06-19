@@ -10,6 +10,8 @@ declare function getGameState(): CGameState | null;
 
 declare function getPlayer(): CPlayer | null;
 
+declare function getEntities(): CEntity[];
+
 declare function isPauseScreen(): boolean;
 
 declare function warp(worldID: number, areaID: number): void;
@@ -51,12 +53,15 @@ declare function getFPS(): number;
 interface Global {
   onFrame(): void;
 
+  onWorldFrame(): void;
+
   onInput(): void;
 
   pads: PADInfo[];
   gameState: CGameState | null;
   player: CPlayer | null;
   world: CWorld | null;
+  CONFIG: any;
 }
 
 declare var DEBUG: boolean;
@@ -115,6 +120,7 @@ interface CPlayer {
   address: number;
   speed: CVector3f;
   rotation: CVector3f;
+  pos: CVector3f;
   itemAmount: number[]
   itemCapacity: number[];
   health: number;
@@ -127,4 +133,8 @@ interface CWorld {
 
 interface Number {
   formatNumber(len: number, decimal: number, filler?: string): string;
+}
+
+interface CEntity {
+  vtable: number;
 }

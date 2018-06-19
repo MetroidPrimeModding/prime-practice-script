@@ -6,6 +6,7 @@ export let CONFIG = {
   showRoomTimers: true,
   showInput: true,
   showFPS: true,
+  showLoadingTriggers: true
 };
 
 export const CONFIG_MENU = new Menu([
@@ -39,6 +40,14 @@ export const CONFIG_MENU = new Menu([
       this.name = 'HUD: Hide FPS'
     } else {
       this.name = 'HUD: Show FPS'
+    }
+  }),
+  new MenuItem('Triggers: Show loading', function(this: MenuItem)  {
+    CONFIG.showLoadingTriggers = !CONFIG.showLoadingTriggers;
+    if (CONFIG.showLoadingTriggers) {
+      this.name = 'Triggers: Hide Loading'
+    } else {
+      this.name = 'Triggers: Show loading'
     }
   })
 ], MENU_2_OFFSET_X, PAUSE_MENU_OFFSET);

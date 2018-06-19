@@ -6,8 +6,9 @@ import {drawPlayerSpeed} from "./drawPlayerSpeed";
 import {drawRoomTimers} from "./drawRoomTimers";
 import {CONFIG, CONFIG_MENU} from "./config";
 import {INVENTORY_MENU} from "./inventory";
-import {CHAR_DIM, GXPrimitive, LINE_HEIGHT, PAUSE_MENU_OFFSET} from "./constants";
+import {CEntity_VTables, CHAR_DIM, GXPrimitive, LINE_HEIGHT, PAUSE_MENU_OFFSET} from "./constants";
 import {PLAYER_MENU} from "./player";
+import {CTrigger} from "./CTrigger";
 
 const mainMenu = new Menu([
   new MenuItem('Room Options [soon]'),
@@ -22,6 +23,8 @@ const mainMenu = new Menu([
   ...(DEBUG ? [new MenuItem('Reload scripts', () => nativeRequire('/mod.js'))] : [])
 ], 10, PAUSE_MENU_OFFSET);
 mainMenu.active = true;
+
+global.CONFIG = CONFIG;
 
 global.onFrame = function () {
   try {
@@ -56,7 +59,6 @@ global.onFrame = function () {
       drawPauseScreen()
     }
     setTextColor(1, 1, 1, 1);
-
   } catch (error) {
     setTextColor(1, 0, 0, 1);
     drawText('Error: ' + error + error.stack, 5, 100);

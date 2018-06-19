@@ -14,3 +14,7 @@ export enum GXPrimitive {
   GX_TRIANGLEFAN = 0xA0,
   GX_QUADS = 0x80,
 }
+
+export enum CEntity_VTables {
+  CTrigger = -0x7FC25B28 //0x805a6f94
+}

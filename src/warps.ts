@@ -81,7 +81,7 @@ export const WARPS = [
       {"name": "Transport to Chozo Ruins East", area: 0x8A31665E},
       {"name": "Transport to Chozo Ruins South", area: 0x0CA514F0},
       {"name": "Transport to Chozo Ruins West", area: 0x11A02448},
-      {"name": "Transport to Magmoor Caverns East", area: 0x15D6FF8B},
+      {"name": "Transpofrt to Magmoor Caverns East", area: 0x15D6FF8B},
       {"name": "Transport to Phazon Mines East", area: 0x7D106670},
       {"name": "Waterfall Cavern", area: 0xE76AD711}
     ]

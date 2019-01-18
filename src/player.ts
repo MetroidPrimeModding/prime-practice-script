@@ -64,6 +64,21 @@ export const POSITION_MENU_ITEMS = [
 
 
 export const STATE_MENU_ITEMS = [
+  new MenuItem('IS on (use while morphed)', () => {
+    writeArray(playerPlusOffset(0x144)(), [NaN, NaN, NaN], writeFloat);
+  }),
+  new MenuItem('Fix Lightshow (use while unmorphed)', () => {
+    writeArray(playerPlusOffset(0x144)(), [0, 0, 0], writeFloat);
+    const cameraBobOffset = readU32(playerPlusOffset(0x76C)());
+
+    writeFloat(cameraBobOffset + 0x10, 0);
+    writeFloat(cameraBobOffset + 0x14, 0);
+    writeFloat(cameraBobOffset + 0x18, 0);
+    writeFloat(cameraBobOffset + 0x1C, 0);
+    writeFloat(cameraBobOffset + 0x38, 0);
+    writeFloat(cameraBobOffset + 0x48, 0);
+    writeFloat(cameraBobOffset + 0x58, 0);
+  }),
   new MenuItem('Floaty Jump', () => {
     let dist = readFloat(playerPlusOffset(0x828)());
     let wc = readBits(playerPlusOffset(0xe4)(), 14, 3);

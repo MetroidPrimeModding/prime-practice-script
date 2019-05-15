@@ -51,6 +51,9 @@ const config = {
       }),
       new PadWithNullsPlugin({
         len: 100 * 1024
+      }),
+      new PadWithNullsPlugin({
+        mod: 32
       })
     ] : [
       new UglifyJsPlugin({
@@ -72,7 +75,10 @@ const config = {
           // output: {
           //   beautify: true
           // },
-        }
+        },
+      }),
+      new PadWithNullsPlugin({
+        mod: 32
       })
     ])
   ]

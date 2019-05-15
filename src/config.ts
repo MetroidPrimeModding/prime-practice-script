@@ -2,8 +2,10 @@ import {Menu, MenuItem} from "./menu";
 import {MENU_2_OFFSET_X, PAUSE_MENU_OFFSET} from "./constants";
 
 export let CONFIG = {
-  showSpeed: true,
-  showRoomTimers: true,
+  showSpeed: false,
+  showPos: false,
+  showHighPPos: false,
+  showRoomTimers: false,
   showInput: true,
   showFPS: true,
   showUnknownTriggers: false,
@@ -14,7 +16,7 @@ export let CONFIG = {
 };
 
 export const CONFIG_MENU = new Menu([
-  new MenuItem('HUD: Hide Speed', function(this: MenuItem) {
+  new MenuItem('HUD: Show Speed', function(this: MenuItem) {
     CONFIG.showSpeed = !CONFIG.showSpeed;
     if (CONFIG.showSpeed) {
       this.name = 'HUD: Hide Speed'
@@ -22,7 +24,23 @@ export const CONFIG_MENU = new Menu([
       this.name = 'HUD: Show Speed'
     }
   }),
-  new MenuItem('HUD: Hide Room Timers', function(this: MenuItem)  {
+  new MenuItem('HUD: Show Pos', function(this: MenuItem) {
+    CONFIG.showPos = !CONFIG.showPos;
+    if (CONFIG.showPos) {
+      this.name = 'HUD: Hide Pos'
+    } else {
+      this.name = 'HUD: Show Pos'
+    }
+  }),
+  new MenuItem('HUD: Show High-Precision Pos', function(this: MenuItem) {
+    CONFIG.showHighPPos = !CONFIG.showHighPPos;
+    if (CONFIG.showHighPPos) {
+      this.name = 'HUD: Hide High-Precision Pos'
+    } else {
+      this.name = 'HUD: Show High-Precision Pos'
+    }
+  }),
+  new MenuItem('HUD: Show Room Timers', function(this: MenuItem)  {
     CONFIG.showRoomTimers = !CONFIG.showRoomTimers;
     if (CONFIG.showRoomTimers) {
       this.name = 'HUD: Hide Room Timers'

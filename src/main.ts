@@ -9,6 +9,8 @@ import {INVENTORY_MENU} from "./inventory";
 import {CEntity_VTables, CHAR_DIM, GXPrimitive, LINE_HEIGHT, PAUSE_MENU_OFFSET} from "./constants";
 import {PLAYER_MENU} from "./player";
 import {CTrigger} from "./CTrigger";
+import {drawPlayerPos} from "./drawPlayerPos";
+import {drawPlayerHighPPos} from "./drawHighPPlayerPos";
 
 const mainMenu = new Menu([
   new MenuItem('Room Options [soon]'),
@@ -45,6 +47,14 @@ global.onFrame = function () {
     }
     if (CONFIG.showSpeed) {
       drawPlayerSpeed(global.player, 10, y);
+      y += LINE_HEIGHT;
+    }
+    if (CONFIG.showPos) {
+      drawPlayerPos(global.player, 10, y);
+      y += LINE_HEIGHT;
+    }
+    if (CONFIG.showHighPPos) {
+      drawPlayerHighPPos(global.player, 10, y);
       y += LINE_HEIGHT;
     }
     if (CONFIG.showRoomTimers) {

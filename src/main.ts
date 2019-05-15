@@ -37,11 +37,15 @@ global.onFrame = function () {
 
     setTextColor(1, 1, 1, 1);
     let y = 10;
-    if (CONFIG.showInput) {
-      drawText('Prime Practice Mod', 10, y);
-      drawIGT(global.gameState, 165, 10);
-      if (global.pads) {
-        drawInputs(global.pads[0], 275, 10);
+    if (CONFIG.showIGT || CONFIG.showInput) {
+      let x = 10;
+      // drawText('Prime Practice Mod', 10, y);
+      if (CONFIG.showIGT) {
+        drawIGT(global.gameState, x, 10);
+        x += 110;
+      }
+      if (global.pads && CONFIG.showInput) {
+        drawInputs(global.pads[0], x, 10);
       }
       y += LINE_HEIGHT;
     }

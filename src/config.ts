@@ -6,6 +6,7 @@ export let CONFIG = {
   showPos: false,
   showHighPPos: false,
   showRoomTimers: false,
+  showIGT: true,
   showInput: true,
   showFPS: true,
   showUnknownTriggers: false,
@@ -46,6 +47,14 @@ export const CONFIG_MENU = new Menu([
       this.name = 'HUD: Hide Room Timers'
     } else {
       this.name = 'HUD: Show Room Timers'
+    }
+  }),
+  new MenuItem('HUD: Hide IGT', function(this: MenuItem)  {
+    CONFIG.showIGT = !CONFIG.showIGT;
+    if (CONFIG.showIGT) {
+      this.name = 'HUD: Hide IGT'
+    } else {
+      this.name = 'HUD: Show IGT'
     }
   }),
   new MenuItem('HUD: Hide Input', function(this: MenuItem)  {
